@@ -111,18 +111,28 @@ bms-electron-app/
 
 ## 빌드 & 배포
 
-### 로컬 패키징 (Windows)
+### 로컬 패키징 (Windows / macOS)
 
 ```bash
 npm run build       # out/ 빌드
-npm run package     # NSIS 설치 파일 + Portable 빌드 → dist/
+npm run package     # Windows + macOS (arm64) 동시 패키징 → dist/
 ```
+
+또는 플랫폼별로 개별 실행할 수 있습니다.
+
+```bash
+npm run package:win   # NSIS 설치 파일 + Portable 빌드 → dist/
+npm run package:mac   # DMG + ZIP (Apple Silicon) 빌드 → dist/
+```
+
+> macOS 빌드는 Apple M 시리즈 칩(arm64)을 타겟으로 합니다. macOS에서 `npm run package:mac`을 실행하면 `dist/`에 `.dmg`와 `.zip` 파일이 생성됩니다.
 
 `electron-builder` 설정은 `package.json`의 `build` 필드에 있습니다.
 
 - `appId`: `net.dotoritos.bms-desktop`
 - `productName`: `BMS Desktop`
-- 타겟: `nsis` (인스톨러), `portable` (단일 실행 파일)
+- Windows 타겟: `nsis` (인스톨러), `portable` (단일 실행 파일)
+- macOS 타겟: `dmg` (디스크 이미지), `zip` (압축 실행 파일) — **arm64 전용**
 - 파일 연관: `.bms` / `.bme` / `.bml` / `.pms` / `.bmson`
 
 ### GitHub Releases 자동 배포
@@ -132,8 +142,8 @@ npm run package     # NSIS 설치 파일 + Portable 빌드 → dist/
 1. `bms-electron-app` 체크아웃 (submodule 재귀 포함)
 2. `npm ci`로 워크스페이스 전체 의존성 설치
 3. `npm run build --workspace=...`로 sibling 패키지 빌드
-4. `bms-electron-app` 빌드 + `electron-builder --win --publish always`
-5. NSIS / Portable 인스톨러를 GitHub Releases에 첨부 + 워크플로 아티팩트로도 업로드
+4. `bms-electron-app` 빌드 + `electron-builder --win --mac --arm64 --publish always`
+5. NSIS / Portable 인스톨러 (Windows) + DMG / ZIP (macOS arm64)을 GitHub Releases에 첨부 + 워크플로 아티팩트로도 업로드
 
 릴리스 절차:
 
