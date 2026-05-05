@@ -19,7 +19,9 @@
     "build": "electron-vite build",
     "preview": "node -e \"delete process.env.ELECTRON_RUN_AS_NODE;require('child_process').execSync('npx electron-vite preview',{stdio:'inherit',env:process.env})\"",
     "start": "node -e \"delete process.env.ELECTRON_RUN_AS_NODE;require('child_process').execSync('npx electron .',{stdio:'inherit',env:process.env})\"",
-    "package": "electron-builder --win",
+    "package": "electron-builder --win --mac --arm64",
+    "package:win": "electron-builder --win",
+    "package:mac": "electron-builder --mac --arm64",
     "type-check": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -83,6 +85,23 @@
         "nsis",
         "portable"
       ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.music-games"
     },
     "nsis": {
       "oneClick": false,

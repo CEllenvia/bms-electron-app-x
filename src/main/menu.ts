@@ -1,8 +1,27 @@
-import { Menu, BrowserWindow } from 'electron';
+import { app, Menu, BrowserWindow } from 'electron';
 import { sendToRenderer } from './ipc/handle';
 
 export function createMenu(): void {
-  const template: Electron.MenuItemConstructorOptions[] = [
+  const template: Electron.MenuItemConstructorOptions[] = [];
+
+  if (process.platform === 'darwin') {
+    template.push({
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    });
+  }
+
+  template.push(
     {
       label: 'File',
       submenu: [
@@ -40,7 +59,7 @@ export function createMenu(): void {
           },
         },
         { type: 'separator' },
-        { role: 'quit' },
+        ...(process.platform !== 'darwin' ? [{ role: 'quit' as const }] : []),
       ],
     },
     {

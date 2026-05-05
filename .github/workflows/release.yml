@@ -19,8 +19,25 @@ permissions:
 
 jobs:
   release:
-    name: Build & Publish (Windows)
-    runs-on: windows-latest
+    name: Build & Publish (${{ matrix.os }})
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: --win
+            artifact-name: windows-installers
+            artifact-pattern: |
+              dist/*.exe
+              dist/*.blockmap
+              dist/latest*.yml
+          - os: macos-latest
+            platform: --mac --arm64
+            artifact-name: macos-installers
+            artifact-pattern: |
+              dist/*.dmg
+              dist/*.zip
+              dist/latest*.yml
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
       - name: Resolve ref
@@ -62,16 +79,13 @@ jobs:
       - name: Package & publish to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win --publish always
+        run: npx electron-builder ${{ matrix.platform }} --publish always
 
       - name: Upload installer artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installers
-          path: |
-            dist/*.exe
-            dist/*.blockmap
-            dist/latest*.yml
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-pattern }}
           retention-days: 14
           if-no-files-found: warn
